@@ -82,7 +82,7 @@ that lay in the house that Jack built.]]
 }
 
 house.verse = function(which)
-    assert(type(which) == 'number' and (which >= 1 and which <= #verses),
+  assert(type(which) == 'number' and (which >= 1 and which <= #verses),
       "index `which` must be a natural number, between 1 and " .. #verses)
   return verses[which]
 end
