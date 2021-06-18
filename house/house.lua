@@ -1,7 +1,5 @@
 local house = {}
 
-local verses = {}
-
 -- "This is  the house  that Jack built."
 --  \_____/  \_/ \___/  \_____________/
 --            \______________________/
@@ -10,7 +8,7 @@ local verses = {}
 --  + "house": Head > Noun
 --  + "that Jack built": Postmodifier > Relative Clause
 
-local verses_elems = {
+local phrases_elems = {
   {['head'] = "house",   ['postmodifier'] = "that Jack built",                                      },
   {['head'] = "malt",                                                  ['rel_verb'] = "lay in"      },
   {['head'] = "rat",                                                   ['rel_verb'] = "ate"         },
@@ -25,31 +23,41 @@ local verses_elems = {
   {['head'] = "horse and the hound and the horn",                      ['rel_verb'] = "belonged to" },
 }
 
-gen_verses = function()
-  for i = 1, #verses_elems do
+local verses = {}
+
+house.verse = function(which)
+  -- returns the verse number 'which' of the nursery rhyme,
+  --  which cumulates previous verses
+  assert(type(which) == 'number' and (which >= 1 and which <= #phrases_elems),
+      "index `which` must be a natural number, between 1 and " .. #phrases_elems)
+  for i = 1, which do
     verses[i] = "This is "
-    verses[i] = verses[i] .. "the " .. verses_elems[i]['head']
-    if verses_elems[i]['postmodifier'] then
-      verses[i] = verses[i] .. " " .. verses_elems[i]['postmodifier']
+    verses[i] = verses[i] .. "the " .. phrases_elems[i]['head']
+    if phrases_elems[i]['postmodifier'] then
+      verses[i] = verses[i] .. " " .. phrases_elems[i]['postmodifier']
     end
-    if verses_elems[i]['rel_verb'] then
-      verses[i] = verses[i] .. "\nthat " .. verses_elems[i]['rel_verb'] .. " "
+    if phrases_elems[i]['rel_verb'] then
+      verses[i] = verses[i] .. "\nthat " .. phrases_elems[i]['rel_verb'] .. " "
       verses[i] = verses[i] .. verses[i-1]:sub(9, verses[i-1]:len()-1)
     end
     verses[i] = verses[i] .. "."
   end
-end
-
-gen_verses()
-
-house.verse = function(which)
-  assert(type(which) == 'number' and (which >= 1 and which <= #verses),
-      "index `which` must be a natural number, between 1 and " .. #verses)
   return verses[which]
 end
 
+house.tale = function()
+  -- returns the last verse of the nursery rhyme,
+  --  which narrates the tale
+  return house.verse(#phrases_elems)
+end
+
 house.recite = function()
-  return table.concat(verses, "\n")
+  -- returns the whole nursery rhyme
+  local whole_nr = {}
+  for i = 1, #phrases_elems do
+    table.insert(whole_nr, house.verse(i))
+  end
+  return table.concat(whole_nr, "\n")
 end
 
 return house
