@@ -23,22 +23,35 @@ local phrases_elems = {
   {['head'] = "horse and the hound and the horn",                      ['rel_verb'] = "belonged to" },
 }
 
+local phrases = {}
+
+local gen_phrases = function()
+  -- assembles all the phrases from their elements
+  for pe_i = 1, #phrases_elems do
+    phrases[pe_i] = "the " .. phrases_elems[pe_i]['head']
+    if phrases_elems[pe_i]['postmodifier'] then
+      phrases[pe_i] = phrases[pe_i] .. " " .. phrases_elems[pe_i]['postmodifier']
+    end
+    if phrases_elems[pe_i]['rel_verb'] then
+      phrases[pe_i] = phrases[pe_i] .. "\nthat " .. phrases_elems[pe_i]['rel_verb']
+    end
+  end
+end
+
+gen_phrases()
+
 local verses = {}
 
 local verse = function(which)
   -- returns the verse number 'which' of the nursery rhyme,
   --  which cumulates previous verses
-  assert(type(which) == 'number' and (which >= 1 and which <= #phrases_elems),
-      "index `which` must be a natural number, between 1 and " .. #phrases_elems)
+  assert(type(which) == 'number' and (which >= 1 and which <= #phrases),
+      "index `which` must be a natural number, between 1 and " .. #phrases)
+  local this_is = "This is "
   for i = 1, which do
-    verses[i] = "This is "
-    verses[i] = verses[i] .. "the " .. phrases_elems[i]['head']
-    if phrases_elems[i]['postmodifier'] then
-      verses[i] = verses[i] .. " " .. phrases_elems[i]['postmodifier']
-    end
-    if phrases_elems[i]['rel_verb'] then
-      verses[i] = verses[i] .. "\nthat " .. phrases_elems[i]['rel_verb'] .. " "
-      verses[i] = verses[i] .. verses[i-1]:sub(9, verses[i-1]:len()-1)
+    verses[i] = this_is .. phrases[i]
+    if i ~= 1 then
+      verses[i] = verses[i] .. " " .. verses[i-1]:sub(this_is:len()+1, verses[i-1]:len()-1)
     end
     verses[i] = verses[i] .. "."
   end
@@ -48,13 +61,13 @@ end
 local tale = function()
   -- returns the last verse of the nursery rhyme,
   --  which narrates the tale
-  return verse(#phrases_elems)
+  return verse(#phrases)
 end
 
 local recite = function()
   -- returns the whole nursery rhyme
   local whole_nr = {}
-  for i = 1, #phrases_elems do
+  for i = 1, #phrases do
     table.insert(whole_nr, verse(i))
   end
   return table.concat(whole_nr, "\n")
