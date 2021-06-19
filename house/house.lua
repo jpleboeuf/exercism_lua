@@ -25,7 +25,7 @@ local phrases_elems = {
 
 local verses = {}
 
-house.verse = function(which)
+local verse = function(which)
   -- returns the verse number 'which' of the nursery rhyme,
   --  which cumulates previous verses
   assert(type(which) == 'number' and (which >= 1 and which <= #phrases_elems),
@@ -45,19 +45,22 @@ house.verse = function(which)
   return verses[which]
 end
 
-house.tale = function()
+local tale = function()
   -- returns the last verse of the nursery rhyme,
   --  which narrates the tale
-  return house.verse(#phrases_elems)
+  return verse(#phrases_elems)
 end
 
-house.recite = function()
+local recite = function()
   -- returns the whole nursery rhyme
   local whole_nr = {}
   for i = 1, #phrases_elems do
-    table.insert(whole_nr, house.verse(i))
+    table.insert(whole_nr, verse(i))
   end
   return table.concat(whole_nr, "\n")
 end
 
+house.verse = verse
+house.tale = tale
+house.recite = recite
 return house
