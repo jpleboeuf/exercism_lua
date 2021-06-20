@@ -47,13 +47,12 @@ local verse = function(which)
   --  which cumulates previous verses
   assert(type(which) == 'number' and (which >= 1 and which <= #phrases),
       "index `which` must be a natural number, between 1 and " .. #phrases)
-  local this_is = "This is "
-  for i = 1, which do
-    verses[i] = this_is .. phrases[i]
-    if i ~= 1 then
-      verses[i] = verses[i] .. " " .. verses[i-1]:sub(this_is:len()+1, verses[i-1]:len()-1)
+  if not verses[which] then
+    verses[which] = "This is"
+    for i = which, 1, -1 do
+      verses[which] = verses[which] .. " " .. phrases[i]
     end
-    verses[i] = verses[i] .. "."
+    verses[which] = verses[which] .. "."
   end
   return verses[which]
 end
